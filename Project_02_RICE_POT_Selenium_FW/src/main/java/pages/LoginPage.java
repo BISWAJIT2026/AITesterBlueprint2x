@@ -33,8 +33,10 @@ public class LoginPage {
 
     public void doLogin(String user, String pass) {
         try {
-            wait.until(ExpectedConditions.visibilityOf(username)).sendKeys(user);
-            wait.until(ExpectedConditions.visibilityOf(password)).sendKeys(pass);
+            wait.until(ExpectedConditions.visibilityOf(username)).clear();
+            username.sendKeys(user);
+            wait.until(ExpectedConditions.visibilityOf(password)).clear();
+            password.sendKeys(pass);
             wait.until(ExpectedConditions.elementToBeClickable(loginButton)).click();
         } catch (TimeoutException e) {
             throw new RuntimeException("Login elements not visible or clickable within timeout.", e);
@@ -49,7 +51,7 @@ public class LoginPage {
             return false;
         }
     }
-    
+
     public String getErrorMessage() {
         try {
             return wait.until(ExpectedConditions.visibilityOf(errorMessage)).getText();

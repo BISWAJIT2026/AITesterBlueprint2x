@@ -15,18 +15,22 @@ public class LoginTests {
     private LoginPage loginPage;
 
     @BeforeTest
-    public void setup() {
+    public void setupDriver() {
         try {
             ChromeOptions options = new ChromeOptions();
             options.addArguments("--remote-allow-origins=*");
             driver = new ChromeDriver(options);
             driver.manage().window().maximize();
             driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(60));
-            driver.get("https://login.salesforce.com/?locale=in");
             loginPage = new LoginPage(driver);
         } catch (Exception e) {
-            throw new RuntimeException("Driver Initialization or Navigation Failed", e);
+            throw new RuntimeException("Driver Initialization Failed", e);
         }
+    }
+
+    @org.testng.annotations.BeforeMethod
+    public void navigateToLogin() {
+        driver.get("https://login.salesforce.com/?locale=in");
     }
 
     @Test(priority = 1)
