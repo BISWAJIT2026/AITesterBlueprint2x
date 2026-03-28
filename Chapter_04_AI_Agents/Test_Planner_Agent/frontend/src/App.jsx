@@ -58,7 +58,7 @@ function App() {
   const testJiraAndNext = async () => {
     setStatus({ type: 'loading', text: 'Testing Jira Connection...' })
     try {
-      const res = await fetch('http://localhost:8000/api/test-jira', {
+      const res = await fetch('/api/test-jira', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(jira)
@@ -83,7 +83,7 @@ function App() {
     setStatus({ type: 'loading', text: 'Fetching Ticket details...' })
     setTicketData(null)
     try {
-      const res = await fetch('http://localhost:8000/api/fetch-jira', {
+      const res = await fetch('/api/fetch-jira', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ jira, ticket_id: ticketId })
@@ -108,7 +108,7 @@ function App() {
     setStatus({ type: 'loading', text: 'Agent is generating your test plan... (This may take a minute)' })
     setGeneratedMarkdown('')
     try {
-      const res = await fetch('http://localhost:8000/api/generate', {
+      const res = await fetch('/api/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ jira, llm, ticket_id: ticketId, context })
@@ -137,7 +137,7 @@ function App() {
     }
     setStatus({ type: 'loading', text: 'Publishing to Confluence...' })
     try {
-      const res = await fetch('http://localhost:8000/api/publish-confluence', {
+      const res = await fetch('/api/publish-confluence', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

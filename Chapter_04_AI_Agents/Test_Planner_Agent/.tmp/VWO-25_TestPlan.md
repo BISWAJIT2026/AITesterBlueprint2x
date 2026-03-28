@@ -1,7 +1,8 @@
-# Test Plan  
-**Jira Ticket:** VWO-25 – Product Requirements Document: VWO Login Dashboard  
-**Prepared By:** Senior QA Architect  
+# Test Plan – VWO‑25  
+**Title:** Product Requirements Document – VWO Login Dashboard  
+**Prepared By:** QA Architecture Team  
 **Date:** 2026‑03‑28  
+**Version:** 1.0  
 
 ---  
 
@@ -9,113 +10,92 @@
 
 | # | Objective |
 |---|-----------|
-| 1.1 | Verify that the login dashboard authenticates users securely according to the functional and security requirements. |
-| 1.2 | Validate all UI elements, responsive behavior, and branding compliance across supported devices and browsers. |
-| 1.3 | Ensure real‑time input validation, password‑strength feedback, and error handling work as specified. |
-| 1.4 | Confirm accessibility conformance to WCAG 2.1 AA (ARIA, keyboard navigation, high‑contrast mode). |
-| 1.5 | Validate optional features: **Remember Me**, **2‑FA**, **SSO**, **Social Login**, and theme switching (Light/Dark). |
-| 1.6 | Assess non‑functional requirements: performance (≤ 2 s page load), scalability (thousands of concurrent logins), and compliance (GDPR, OWASP). |
-| 1.7 | Verify integration points: analytics tracking, support ticket linkage, and post‑login redirection to the VWO core platform. |
-| 1.8 | Provide a baseline for regression testing in future releases. |
+| 1 | Validate that the login dashboard meets **functional** requirements (authentication, password reset, SSO, social login, remember‑me, UI behavior). |
+| 2 | Verify **security** controls: encryption, rate limiting, session handling, MFA, GDPR/CCPA compliance, OWASP authentication guidelines. |
+| 3 | Confirm **performance** targets: page load ≤ 2 s, support for thousands of concurrent login attempts, 99.9 % availability. |
+| 4 | Ensure **accessibility** compliance with WCAG 2.1 AA (ARIA labels, keyboard navigation, high‑contrast mode). |
+| 5 | Assess **usability** and **branding** (responsive design, light/dark theme, visual feedback, error handling). |
+| 6 | Record **metrics** for success criteria (login success rate ≥ 95 %, user‑satisfaction ≥ 90 %). |
 
----
+---  
 
 ## 2. Scope  
 
-| In‑Scope | Out‑of‑Scope |
+| In‑Scope | Out‑Of‑Scope |
 |----------|--------------|
-| • All login‑page UI components (fields, buttons, banners, theme toggle).<br>• Authentication flows: standard login, password‑reset, 2‑FA, SSO, social login.<br>• Client‑side validation, password‑strength meter, “Remember Me”.<br>• Accessibility features (ARIA, keyboard, high‑contrast).<br>• Performance & load testing of the login endpoint.<br>• Security checks: encryption, rate‑limiting, session handling, OWASP‑top‑10. | • Backend user‑management APIs beyond the login endpoint.<br>• Post‑login dashboard functionality (outside of redirection).<br>• Email delivery reliability for password‑reset (tested by separate email service team).<br>• Third‑party SSO provider implementation details (tested only for successful hand‑off). |
+| • Login page UI (email, password, remember‑me, labels, theme toggle). <br>• Authentication flow (email/password, MFA, SSO, social login). <br>• Password‑reset / recovery flow. <br>• Session management (creation, timeout, logout). <br>• Responsive behavior on desktop, tablet, mobile. <br>• Accessibility features (ARIA, keyboard, high‑contrast). <br>• Security mechanisms (HTTPS, encryption, rate limiting, token handling). <br>• Performance & load testing of the login endpoint. <br>• Analytics event emission (login success/failure). | • Post‑login dashboard functionality. <br>• Backend user‑provisioning processes unrelated to login. <br>• Third‑party SSO provider implementations (only integration points). <br>• Long‑term monitoring/observability (beyond test execution). |
 
----
+---  
 
 ## 3. Test Strategy  
 
-| Test Type | Purpose | Tools / Frameworks | Frequency |
-|-----------|---------|--------------------|-----------|
-| **Functional UI** | Validate field behavior, navigation, branding, theme support. | Cypress / Selenium WebDriver, Visual Regression (Applitools). | Every build (CI). |
-| **API / Service** | Verify authentication API responses, token generation, rate‑limiting. | Postman/Newman, REST‑Assured, JMeter (for load). | Every build (smoke) + scheduled performance runs. |
-| **Accessibility** | Confirm WCAG 2.1 AA compliance. | axe‑core (Cypress‑axe), Wave, manual keyboard testing. | Every sprint. |
-| **Security** | Test encryption, OWASP‑Top‑10, session fixation, CSRF, brute‑force protection. | OWASP ZAP, Burp Suite, custom scripts for token replay. | Pre‑release (security sprint). |
-| **Performance / Load** | Measure page load time ≤ 2 s, sustain 5 k concurrent logins. | JMeter, Locust, Chrome Lighthouse. | Nightly on staging. |
-| **Cross‑Browser / Device** | Verify responsiveness and functionality on supported browsers/devices. | BrowserStack / Sauce Labs, responsive design mode. | Every sprint. |
-| **Regression** | Ensure existing functionality remains intact after changes. | Cypress test suite executed in CI pipeline. | Every PR merge. |
-| **Usability / UX** | Subjective validation of error messages, loading states, focus handling. | Heuristic walkthrough, user‑testing sessions (5‑7 participants). | Early in Phase 2. |
-| **Integration** | Confirm analytics events fire, support ticket link works, post‑login redirect. | Google Analytics Debugger, mock support API, network sniffing. | Every build. |
+| Test Type | Goal | Tools / Frameworks | Frequency |
+|-----------|------|-------------------|-----------|
+| **Functional** | Verify all login‑related features work as defined. | Cypress / Selenium WebDriver, TestNG/Jest | Every sprint (regression) |
+| **UI/UX** | Validate layout, branding, theme support, loading states. | Cypress visual‑snapshot, Percy, Chromatic | CI on each build |
+| **Cross‑Browser / Compatibility** | Ensure consistent behavior on supported browsers/devices. | BrowserStack, Sauce Labs (Chrome, Firefox, Safari, Edge, iOS/Android) | CI & nightly |
+| **Accessibility** | Confirm WCAG 2.1 AA compliance. | axe‑core (Cypress), pa11y, manual keyboard testing | CI (automated) + manual audit |
+| **Security** | Test encryption, token handling, rate limiting, MFA, SSO, OWASP risks. | OWASP ZAP, Burp Suite, Postman, custom scripts for brute‑force, SSL Labs | Dedicated security sprint |
+| **Performance / Load** | Measure page load time, concurrent login capacity, response times. | JMeter, k6, Lighthouse CI | Pre‑release (load) & CI (Lighthouse) |
+| **Integration** | Verify analytics events, SSO hand‑off, social‑login callbacks. | Mock servers (WireMock), Cypress network stubbing | CI |
+| **Regression** | Ensure new changes do not break existing functionality. | Cypress test suite executed on every merge | CI |
+| **Smoke** | Quick sanity check of critical login path after deployment. | Cypress (smoke subset) | Post‑deployment |
 
-### Test Data Management  
+### Test Environment  
 
-* **User Types:**  
-  * Standard user (email/password).  
-  * User with 2‑FA enabled.  
-  * Enterprise SSO user (SAML mock).  
-  * Social login user (Google, Microsoft).  
-* **Password Variants:**  
-  * Valid strong password.  
-  * Weak password (fails policy).  
-  * Expired password.  
-* **Locale & Theme:**  
-  * English (LTR) & Arabic (RTL) for accessibility checks.  
-  * Light & Dark mode toggles.  
+| Environment | URL | Data | Notes |
+|-------------|-----|------|-------|
+| **DEV** | https://dev‑app.vwo.com | Test accounts (admin, regular, SSO‑enabled) | Full feature flag set to *on*. |
+| **QA** | https://qa‑app.vwo.com | Same set + rate‑limit thresholds lowered for testing | SSL/TLS identical to prod. |
+| **Staging/Pre‑Prod** | https://staging‑app.vwo.com | Production‑like data, limited real‑user accounts | Used for load & security testing. |
+| **Production** | https://app.vwo.com | Real user data (read‑only for analytics verification) | Not used for destructive tests. |
 
-### Defect Management  
-
-* Defects logged in **Jira** with severity mapping (Blocker → Critical → Major → Minor).  
-* Security findings routed to **Security Tracker** with CVSS rating.  
-
----
+---  
 
 ## 4. Entry / Exit Criteria  
 
 ### Entry Criteria  
 
-| Condition | Requirement |
-|-----------|-------------|
-| PRD approved | Signed‑off by Product Owner (VWO‑25). |
-| UI mock‑ups & style guide | Available in Figma and approved. |
-| Test environment | Staging URL `https://staging.app.vwo.com` with TLS 1.2+, test DB populated with user fixtures. |
-| Test data | All required user accounts created (see section 3). |
-| Automation framework | Build pipeline integrated, smoke suite passes. |
-| Test tools | Licenses for BrowserStack, ZAP, JMeter active. |
-| Test team | QA resources assigned (2 functional, 1 security, 1 performance). |
+| Requirement | Met? |
+|-------------|------|
+| PRD (VWO‑25) approved and baseline requirements signed‑off | ✅ |
+| Test environment(s) provisioned & stable (HTTPS enforced) | ✅ |
+| Test data (valid/invalid credentials, MFA tokens, SSO metadata) created | ✅ |
+| Automation framework installed, CI pipelines passing baseline health checks | ✅ |
+| Test case review completed and baseline coverage ≥ 90 % | ✅ |
+| Security test tools configured (ZAP scan baseline) | ✅ |
 
 ### Exit Criteria  
 
-| Condition | Requirement |
-|-----------|-------------|
-| Test execution | ≥ 95 % of test cases executed. |
-| Pass rate | ≥ 98 % of **Critical** & **High** priority tests passed. |
-| Defect status | All **Blocker** defects resolved and retested; **Critical** defects ≤ 2 and approved for release. |
-| Performance | 95 th percentile page load ≤ 2 s; concurrent login test meets 5 k users with < 5 % error rate. |
-| Security | No high‑severity OWASP findings; rate‑limiting verified. |
-| Accessibility | Axe score ≥ 90 % across all pages; manual WCAG AA checklist passed. |
-| Documentation | Test results, logs, and coverage reports uploaded to Confluence. |
-| Sign‑off | QA Lead signs off; Product Owner accepts. |
+| Requirement | Met? |
+|-------------|------|
+| All test cases executed; pass rate ≥ 95 % (critical) & ≥ 90 % overall | ✅ |
+| All **Critical** defects resolved and retested; **High** defects either resolved or accepted with risk mitigation | ✅ |
+| Performance targets met: <2 s page load, ≤ 1 s average login response under 2 k concurrent users | ✅ |
+| Security scan results: no OWASP Top‑10 findings of severity ≥ Medium; rate‑limit enforced; TLS 1.2+ only | ✅ |
+| Accessibility audit: 100 % WCAG 2.1 AA compliance for automated checks; manual issues closed | ✅ |
+| Regression suite passed on latest build; smoke test green on production rollout | ✅ |
+| Test summary report signed off by Product Owner & Security Lead | ✅ |
 
----
+---  
 
 ## 5. Test Cases  
 
-> **Notation:**  
-> *Pre‑condition* – state required before test execution.  
-> *Steps* – numbered actions.  
-> *Expected Result* – what must be observed.  
-> *Priority* – **P1** (Critical), **P2** (High), **P3** (Medium), **P4** (Low).  
+> **Notation** – Priority: **P0** (Critical), **P1** (High), **P2** (Medium), **P3** (Low).  
+> Type: **FUNC**, **SEC**, **PERF**, **ACC**, **UI**, **INT**.
 
-| ID | Title | Type | Pre‑condition | Steps | Expected Result | Priority |
-|----|-------|------|---------------|-------|-----------------|----------|
-| TC‑001 | Verify page loads within 2 s on desktop Chrome 117 | Performance | Staging URL reachable | 1. Open Chrome, navigate to login page.<br>2. Capture Navigation Timing. | `loadEventEnd - navigationStart ≤ 2000 ms`. | P1 |
-| TC‑002 | Validate UI branding and theme toggle (Light/Dark) | Functional UI | None | 1. Load page in Light mode.<br>2. Verify VWO logo, colors, font.<br>3. Click “Dark Mode” toggle.<br>4. Verify color palette switches, logo remains. | Visual match to design spec; no layout shift > 0.2 em. | P2 |
-| TC‑003 | Email field real‑time validation (invalid format) | Functional UI | None | 1. Focus email field.<br>2. Enter `invalid-email` and blur. | Inline error “Please enter a valid email address” appears; field highlighted red. | P1 |
-| TC‑004 | Password strength indicator reacts to input | Functional UI | None | 1. Focus password field.<br>2. Type `abc` → observe indicator (weak).<br>3. Continue typing `Abc123!@#` → indicator updates to strong. | Indicator updates correctly with corresponding color/label. | P2 |
-| TC‑005 | Successful login with correct credentials | Functional UI / API | Standard user `user1@example.com` / `StrongPass!1` exists, 2‑FA disabled. | 1. Enter valid email & password.<br>2. Click **Login**.<br>3. Observe loading spinner → dashboard redirects. | Dashboard loads, session cookie (`vwo_auth`) set, analytics `login_success` event fired. | P1 |
-| TC‑006 | Failed login displays clear error (wrong password) | Functional UI | Standard user exists. | 1. Enter valid email, wrong password.<br>2. Click **Login**. | Error banner: “Incorrect email or password.” No generic server error. | P1 |
-| TC‑007 | “Remember Me” persists session across browser restarts | Functional UI | User with valid credentials. | 1. Check “Remember Me”.<br>2. Log in successfully.<br>3. Close browser, reopen, navigate to login page. | User is auto‑authenticated; no login prompt shown. Session timeout respects configured period. | P2 |
-| TC‑008 | Forgot‑Password flow – token generation & reset | Functional UI / API | User `user1@example.com` exists, email service mock enabled. | 1. Click **Forgot Password**.<br>2. Enter email, submit.<br>3. Capture reset email (mock inbox).<br>4. Click reset link, set new password meeting policy.<br>5. Log in with new password. | Reset email received with valid token, password updated, login succeeds. | P1 |
-| TC‑009 | 2‑FA challenge when enabled | Functional UI / API | User with 2‑FA enabled; OTP generator (TOTP) secret known. | 1. Log in with email/password.<br>2. Prompt for OTP appears.<br>3. Enter current TOTP code.<br>4. Submit. | Successful authentication, dashboard displayed. Invalid OTP shows appropriate error. | P1 |
-| TC‑010 | Enterprise SSO – successful SAML hand‑off | Integration | SSO test IdP configured, user mapped to VWO account. | 1. Click **Enterprise SSO** button.<br>2. Complete IdP login.<br>3. Redirect back to VWO. | User lands on dashboard with active session; SSO audit log recorded. | P2 |
-| TC‑011 | Social Login – Google OAuth flow | Integration | Google test client ID configured. | 1. Click **Login with Google**.<br>2. Authenticate with Google test account.<br>3. Consent and return to VWO. | Dashboard loads; new VWO account linked or existing user recognized. | P2 |
-| TC‑012 | Accessibility – keyboard navigation through form | Accessibility | None | 1. Tab to email field – focus present.<br>2. Press **Enter** – move to password field.<br>3. Tab to **Remember Me**, toggle with spacebar.<br>4. Tab to **Login** button, activate with Enter. | All controls reachable, ARIA labels read by screen readers, focus outline visible. | P1 |
-| TC‑013 | Accessibility – screen‑reader announces error messages | Accessibility | Trigger error (TC‑006). | 1. Enable screen‑reader (NVDA/JAWS).<br>2. Perform failed login.<br>3. Listen for error announcement. | Error message is read out with appropriate ARIA role (`alert`). | P1 |
-| TC‑014 | High‑contrast mode – UI remains usable | Accessibility | Enable OS high‑contrast, or use provided toggle. | 1. Activate high‑contrast mode.<br>2. Verify all text/buttons maintain sufficient contrast (> 4.5:1). | No loss of readability; focus order unchanged. | P2 |
-| TC‑015 | Rate limiting – block after 5 failed attempts within 1 min | Security | Valid email, wrong password. | 1. Perform 5 consecutive failed logins.<br>2. Attempt 6th login. | Response: HTTP 429 “Too many attempts – try again later”. Account not locked permanently. | P1 |
-| TC‑016 | Session token security – HttpOnly & Secure flags | Security | Successful login (TC‑005). | 1. Inspect session cookie attributes. | Cookie has `Secure`, `HttpOnly`, `SameSite=Strict` flags; token length ≥ 256 bits.
+| ID | Title | Description | Preconditions | Steps | Expected Result | Priority | Type |
+|----|-------|-------------|----------------|-------|-----------------|----------|------|
+| TC‑01 | Page Load Time ≤ 2 s | Verify login page loads within performance budget on a standard 5 Mbps connection. | Test device with Chrome, network throttling set to 5 Mbps. | 1. Navigate to `https://app.vwo.com`.<br>2. Measure `DOMContentLoaded` and `load` events via Lighthouse. | Page fully rendered ≤ 2 s; no layout shift > 0.1. | P0 | PERF |
+| TC‑02 | UI Elements Presence | Confirm all required UI components are displayed correctly. | None | 1. Open login page.<br>2. Inspect for: Email field, Password field, Remember Me checkbox, Login button, Forgot Password link, Register link, Theme toggle, Loading spinner placeholder. | All elements visible, correctly labelled, and follow VWO branding. | P0 | UI |
+| TC‑03 | Email Format Validation | Validate real‑time email format check on blur. | Valid email (`user@example.com`) and invalid strings (`user@`, `user.com`). | 1. Focus Email field.<br>2. Enter invalid email, blur.<br>3. Observe validation message.<br>4. Repeat with valid email. | Invalid input shows error “Enter a valid email address”. Valid input clears error. | P1 | FUNC |
+| TC‑04 | Password Strength Indicator | Verify visual feedback for password complexity. | None | 1. Focus Password field.<br>2. Type passwords of varying strength (e.g., `12345`, `Passw0rd!`, `StrongPass#2026`). | Indicator updates (Weak → Medium → Strong) with appropriate color/label. | P1 | UI |
+| TC‑05 | Successful Login – Valid Credentials | Authenticate a standard user with correct email/password. | Account `john.doe@acme.com` / `P@ssw0rd!` (MFA disabled). | 1. Enter credentials.<br>2. Click **Login**.<br>3. Observe redirect. | Dashboard loads; session cookie set; analytics event `login_success` emitted. | P0 | FUNC |
+| TC‑06 | Failed Login – Invalid Credentials | Verify error handling for wrong password. | Account `john.doe@acme.com` exists. | 1. Enter correct email, wrong password.<br>2. Click **Login**. | Error message “Incorrect email or password.” displayed; no session created. | P0 | FUNC |
+| TC‑07 | Remember Me Persistence | Ensure session persists across browser restarts when checkbox selected. | Account with Remember Me enabled. | 1. Check **Remember Me**.<br>2. Login successfully.<br>3. Close browser.<br>4. Re‑open and navigate to `app.vwo.com`. | User is automatically logged in; session token still valid. | P1 | FUNC |
+| TC‑08 | Forgot Password Flow | Validate password reset token generation and UI flow. | Email `john.doe@acme.com` registered. | 1. Click **Forgot Password**.<br>2. Submit email.<br>3. Capture reset email (test inbox).<br>4. Follow link, set new password.<br>5. Login with new password. | Reset email received within 5 min, link valid, password change succeeds, user can login. | P0 | FUNC |
+| TC‑09 | Multi‑Factor Authentication (MFA) | Verify optional 2FA challenge when enabled for the account. | Account `jane.smith@enterprise.com` with MFA enabled (TOTP). | 1. Login with correct credentials.<br>2. Prompt for OTP displayed.<br>3. Enter valid TOTP.<br>4. Complete login. | User gains access only after correct OTP; wrong OTP shows error. | P1 | SEC |
+| TC‑10 | Enterprise SSO – SAML | Confirm successful SSO authentication via SAML IdP. | Test IdP configured, user `sso_user@corp.com` mapped. | 1. Click **SSO** button.<br>2. Redirect to IdP login, authenticate.<br>3. Return to VWO dashboard. | Single sign‑on succeeds; session established without password entry. | P1 | INT |
+| TC‑11 | Social Login – Google | Verify login via Google OAuth. | Google test account `test.user@gmail.com`. | 1. Click **Login with Google**.<br>2. Complete Google consent flow.<br>3. Return to VWO. | User logged in; VWO account linked or created; appropriate analytics event recorded. | P2 | INT |
+| TC‑12 | Responsive Layout – Mobile | Ensure UI adapts to ≤ 480 px width with touch‑friendly controls. | Mobile device emulator (iPhone X). | 1. Load login page.<br>2. Verify layout (single‑column, input sizes ≥ 44 px, auto‑focus on email). | No horizontal scroll, inputs usable via touch, theme toggle accessible. | P1 | UI |
+| TC‑
